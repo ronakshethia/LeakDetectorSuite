@@ -1,4 +1,4 @@
-name: Publish NuGet Packages
+name: Pack & Publish NuGet Packages
 
 on:
   workflow_dispatch:
@@ -8,9 +8,6 @@ on:
         required: true
         default: false
         type: boolean
-  release:
-    types:
-      - published
 
 permissions:
   contents: read
@@ -26,6 +23,7 @@ env:
 
 jobs:
   pack-and-publish:
+    if: github.actor == 'ronakshethia'
     runs-on: windows-latest
 
     steps:
@@ -37,32 +35,37 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Install MAUI workloads
+      # 🔢 Auto version generation (incremental)
+      - name: Generate Version
+        id: version
         shell: pwsh
         run: |
-          dotnet workload install maui maui-android maui-ios maui-maccatalyst maui-windows --ignore-failed-sources
+          $baseVersion = "1.0.0"
+          $runNumber = "${{ github.run_number }}"
+          $version = "$baseVersion.$runNumber"
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+          Write-Host "Generated version: $version"
 
       - name: Restore
-        shell: pwsh
-        run: |
-          dotnet restore .\LeakDetectorSuite.sln
+        run: dotnet restore .\LeakDetectorSuite.sln
 
       - name: Build
-        shell: pwsh
-        run: |
-          dotnet build .\LeakDetectorSuite.sln -c Release --no-restore -v:minimal
+        run: dotnet build .\LeakDetectorSuite.sln -c Release --no-restore
 
-      - name: Pack
+      - name: Prepare output directory
         shell: pwsh
         run: |
-          Remove-Item -LiteralPath $env:PACKAGE_OUTPUT_DIR -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Recurse -Force $env:PACKAGE_OUTPUT_DIR -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Path $env:PACKAGE_OUTPUT_DIR | Out-Null
 
+      # 📦 Pack (safe set — excluding MAUI for stability)
+      - name: Pack projects
+        shell: pwsh
+        run: |
           $projects = @(
             '.\src\LeakDetectorSuite.Memory\LeakDetectorSuite.Memory.csproj',
             '.\src\LeakDetectorSuite.Performance\LeakDetectorSuite.Performance.csproj',
-            '.\src\LeakDetectorSuite.Threading\LeakDetectorSuite.Threading.csproj',
-            '.\src\LeakDetectorSuite.Maui\LeakDetectorSuite.Maui.csproj'
+            '.\src\LeakDetectorSuite.Threading\LeakDetectorSuite.Threading.csproj'
           )
 
           foreach ($project in $projects) {
@@ -70,28 +73,27 @@ jobs:
               -c Release `
               --no-build `
               --output $env:PACKAGE_OUTPUT_DIR `
-              -p:ContinuousIntegrationBuild=true `
-              -v:minimal
+              -p:PackageVersion=${{ steps.version.outputs.version }} `
+              -p:ContinuousIntegrationBuild=true
           }
 
-      - name: Upload package artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: nuget-packages
           path: |
             artifacts/nuget/*.nupkg
             artifacts/nuget/*.snupkg
-          if-no-files-found: error
 
-      - name: Publish packages to nuget.org
-        if: ${{ github.event_name == 'release' || inputs.publish == true }}
+      # 🚀 Publish ONLY if explicitly requested + only you
+      - name: Publish to NuGet
+        if: ${{ inputs.publish == true && github.actor == 'ronakshethia' }}
         shell: pwsh
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         run: |
           if ([string]::IsNullOrWhiteSpace($env:NUGET_API_KEY)) {
-            Write-Host "NUGET_API_KEY is not configured. Skipping publish."
-            exit 0
+            throw "NUGET_API_KEY is not configured"
           }
 
           Get-ChildItem $env:PACKAGE_OUTPUT_DIR -Filter *.nupkg |
