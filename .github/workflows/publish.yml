@@ -35,7 +35,7 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      # 🔢 Auto version generation (incremental)
+      # 🔢 Auto version (incremental)
       - name: Generate Version
         id: version
         shell: pwsh
@@ -46,19 +46,28 @@ jobs:
           echo "version=$version" >> $env:GITHUB_OUTPUT
           Write-Host "Generated version: $version"
 
-      - name: Restore
-        run: dotnet restore .\LeakDetectorSuite.sln
+      # ✅ Restore ONLY library projects (no MAUI)
+      - name: Restore libraries
+        run: |
+          dotnet restore .\src\LeakDetectorSuite.Memory\LeakDetectorSuite.Memory.csproj
+          dotnet restore .\src\LeakDetectorSuite.Performance\LeakDetectorSuite.Performance.csproj
+          dotnet restore .\src\LeakDetectorSuite.Threading\LeakDetectorSuite.Threading.csproj
 
-      - name: Build
-        run: dotnet build .\LeakDetectorSuite.sln -c Release --no-restore
+      # ✅ Build ONLY library projects
+      - name: Build libraries
+        run: |
+          dotnet build .\src\LeakDetectorSuite.Memory\LeakDetectorSuite.Memory.csproj -c Release --no-restore
+          dotnet build .\src\LeakDetectorSuite.Performance\LeakDetectorSuite.Performance.csproj -c Release --no-restore
+          dotnet build .\src\LeakDetectorSuite.Threading\LeakDetectorSuite.Threading.csproj -c Release --no-restore
 
+      # 📦 Prepare output folder
       - name: Prepare output directory
         shell: pwsh
         run: |
           Remove-Item -Recurse -Force $env:PACKAGE_OUTPUT_DIR -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Path $env:PACKAGE_OUTPUT_DIR | Out-Null
 
-      # 📦 Pack (safe set — excluding MAUI for stability)
+      # 📦 Pack libraries
       - name: Pack projects
         shell: pwsh
         run: |
@@ -77,6 +86,7 @@ jobs:
               -p:ContinuousIntegrationBuild=true
           }
 
+      # 📤 Upload artifacts (always)
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -85,7 +95,7 @@ jobs:
             artifacts/nuget/*.nupkg
             artifacts/nuget/*.snupkg
 
-      # 🚀 Publish ONLY if explicitly requested + only you
+      # 🚀 Publish (ONLY if manually enabled)
       - name: Publish to NuGet
         if: ${{ inputs.publish == true && github.actor == 'ronakshethia' }}
         shell: pwsh
