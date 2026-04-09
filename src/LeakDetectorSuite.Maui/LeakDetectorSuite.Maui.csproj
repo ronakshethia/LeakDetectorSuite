@@ -68,6 +68,7 @@
 
     <PackageProjectUrl>https://github.com/ronakshethia/LeakDetectorSuite</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>icon.png</PackageIcon>
 
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -81,6 +82,10 @@
           Pack="true"
           PackagePath="\"
           Condition="Exists('..\..\README.md')" />
+    <None Include="icon.png"
+          Pack="true"
+          PackagePath="icon.png"
+          Condition="Exists('icon.png')" />
   </ItemGroup>
 
   <!-- MAUI -->

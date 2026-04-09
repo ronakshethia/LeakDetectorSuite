@@ -1,0 +1,107 @@
+name: Publish NuGet Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish packages to nuget.org
+        required: true
+        default: false
+        type: boolean
+  release:
+    types:
+      - published
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  DOTNET_NOLOGO: true
+  NUGET_SOURCE: https://api.nuget.org/v3/index.json
+  PACKAGE_OUTPUT_DIR: artifacts/nuget
+
+jobs:
+  pack-and-publish:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install MAUI workloads
+        shell: pwsh
+        run: |
+          dotnet workload install maui maui-android maui-ios maui-maccatalyst maui-windows --ignore-failed-sources
+
+      - name: Restore
+        shell: pwsh
+        run: |
+          dotnet restore .\LeakDetectorSuite.sln
+
+      - name: Build
+        shell: pwsh
+        run: |
+          dotnet build .\LeakDetectorSuite.sln -c Release --no-restore -v:minimal
+
+      - name: Pack
+        shell: pwsh
+        run: |
+          Remove-Item -LiteralPath $env:PACKAGE_OUTPUT_DIR -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path $env:PACKAGE_OUTPUT_DIR | Out-Null
+
+          $projects = @(
+            '.\src\LeakDetectorSuite.Memory\LeakDetectorSuite.Memory.csproj',
+            '.\src\LeakDetectorSuite.Performance\LeakDetectorSuite.Performance.csproj',
+            '.\src\LeakDetectorSuite.Threading\LeakDetectorSuite.Threading.csproj',
+            '.\src\LeakDetectorSuite.Maui\LeakDetectorSuite.Maui.csproj'
+          )
+
+          foreach ($project in $projects) {
+            dotnet pack $project `
+              -c Release `
+              --no-build `
+              --output $env:PACKAGE_OUTPUT_DIR `
+              -p:ContinuousIntegrationBuild=true `
+              -v:minimal
+          }
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: |
+            artifacts/nuget/*.nupkg
+            artifacts/nuget/*.snupkg
+          if-no-files-found: error
+
+      - name: Publish packages to nuget.org
+        if: ${{ (github.event_name == 'release' || inputs.publish == true) && secrets.NUGET_API_KEY != '' }}
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          Get-ChildItem $env:PACKAGE_OUTPUT_DIR -Filter *.nupkg |
+            Where-Object { $_.Name -notlike '*.symbols.nupkg' } |
+            ForEach-Object {
+              dotnet nuget push $_.FullName `
+                --api-key $env:NUGET_API_KEY `
+                --source $env:NUGET_SOURCE `
+                --skip-duplicate
+            }
+
+          Get-ChildItem $env:PACKAGE_OUTPUT_DIR -Filter *.snupkg |
+            ForEach-Object {
+              dotnet nuget push $_.FullName `
+                --api-key $env:NUGET_API_KEY `
+                --source $env:NUGET_SOURCE `
+                --skip-duplicate
+            }
