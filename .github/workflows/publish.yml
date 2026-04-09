@@ -84,11 +84,16 @@ jobs:
           if-no-files-found: error
 
       - name: Publish packages to nuget.org
-        if: ${{ (github.event_name == 'release' || inputs.publish == true) && secrets.NUGET_API_KEY != '' }}
+        if: ${{ github.event_name == 'release' || inputs.publish == true }}
         shell: pwsh
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         run: |
+          if ([string]::IsNullOrWhiteSpace($env:NUGET_API_KEY)) {
+            Write-Host "NUGET_API_KEY is not configured. Skipping publish."
+            exit 0
+          }
+
           Get-ChildItem $env:PACKAGE_OUTPUT_DIR -Filter *.nupkg |
             Where-Object { $_.Name -notlike '*.symbols.nupkg' } |
             ForEach-Object {
