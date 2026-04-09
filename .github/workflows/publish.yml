@@ -12,10 +12,6 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: publish-${{ github.ref }}
-  cancel-in-progress: false
-
 env:
   DOTNET_NOLOGO: true
   NUGET_SOURCE: https://api.nuget.org/v3/index.json
@@ -27,15 +23,24 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
 
-      # 🔢 Auto version (incremental)
+      # 🔴 REQUIRED for MAUI
+      - name: Install MAUI workloads
+        shell: pwsh
+        run: |
+          dotnet workload install maui `
+            maui-android `
+            maui-ios `
+            maui-maccatalyst `
+            maui-windows `
+            --ignore-failed-sources
+
+      # 🔢 Version
       - name: Generate Version
         id: version
         shell: pwsh
@@ -44,37 +49,31 @@ jobs:
           $runNumber = "${{ github.run_number }}"
           $version = "$baseVersion.$runNumber"
           echo "version=$version" >> $env:GITHUB_OUTPUT
-          Write-Host "Generated version: $version"
 
-      # ✅ Restore ONLY library projects (no MAUI)
-      - name: Restore libraries
-        run: |
-          dotnet restore .\src\LeakDetectorSuite.Memory\LeakDetectorSuite.Memory.csproj
-          dotnet restore .\src\LeakDetectorSuite.Performance\LeakDetectorSuite.Performance.csproj
-          dotnet restore .\src\LeakDetectorSuite.Threading\LeakDetectorSuite.Threading.csproj
+      # ✅ Restore FULL solution (now safe)
+      - name: Restore
+        run: dotnet restore .\LeakDetectorSuite.sln
 
-      # ✅ Build ONLY library projects
-      - name: Build libraries
-        run: |
-          dotnet build .\src\LeakDetectorSuite.Memory\LeakDetectorSuite.Memory.csproj -c Release --no-restore
-          dotnet build .\src\LeakDetectorSuite.Performance\LeakDetectorSuite.Performance.csproj -c Release --no-restore
-          dotnet build .\src\LeakDetectorSuite.Threading\LeakDetectorSuite.Threading.csproj -c Release --no-restore
+      # ✅ Build FULL solution
+      - name: Build
+        run: dotnet build .\LeakDetectorSuite.sln -c Release --no-restore
 
-      # 📦 Prepare output folder
+      # 📦 Prepare output
       - name: Prepare output directory
         shell: pwsh
         run: |
           Remove-Item -Recurse -Force $env:PACKAGE_OUTPUT_DIR -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Path $env:PACKAGE_OUTPUT_DIR | Out-Null
 
-      # 📦 Pack libraries
+      # 📦 Pack ALL projects (including MAUI)
       - name: Pack projects
         shell: pwsh
         run: |
           $projects = @(
             '.\src\LeakDetectorSuite.Memory\LeakDetectorSuite.Memory.csproj',
             '.\src\LeakDetectorSuite.Performance\LeakDetectorSuite.Performance.csproj',
-            '.\src\LeakDetectorSuite.Threading\LeakDetectorSuite.Threading.csproj'
+            '.\src\LeakDetectorSuite.Threading\LeakDetectorSuite.Threading.csproj',
+            '.\src\LeakDetectorSuite.Maui\LeakDetectorSuite.Maui.csproj'
           )
 
           foreach ($project in $projects) {
@@ -86,16 +85,15 @@ jobs:
               -p:ContinuousIntegrationBuild=true
           }
 
-      # 📤 Upload artifacts (always)
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      # 📤 Upload artifacts
+      - uses: actions/upload-artifact@v4
         with:
           name: nuget-packages
           path: |
             artifacts/nuget/*.nupkg
             artifacts/nuget/*.snupkg
 
-      # 🚀 Publish (ONLY if manually enabled)
+      # 🚀 Publish
       - name: Publish to NuGet
         if: ${{ inputs.publish == true && github.actor == 'ronakshethia' }}
         shell: pwsh
@@ -108,14 +106,6 @@ jobs:
 
           Get-ChildItem $env:PACKAGE_OUTPUT_DIR -Filter *.nupkg |
             Where-Object { $_.Name -notlike '*.symbols.nupkg' } |
-            ForEach-Object {
-              dotnet nuget push $_.FullName `
-                --api-key $env:NUGET_API_KEY `
-                --source $env:NUGET_SOURCE `
-                --skip-duplicate
-            }
-
-          Get-ChildItem $env:PACKAGE_OUTPUT_DIR -Filter *.snupkg |
             ForEach-Object {
               dotnet nuget push $_.FullName `
                 --api-key $env:NUGET_API_KEY `
