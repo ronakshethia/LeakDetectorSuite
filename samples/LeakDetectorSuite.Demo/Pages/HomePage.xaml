@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LeakDetector.Demo.HomePage"
+             Title="LeakDetector Demo">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="0">
+            <Label Text="LeakDetector Demo" Style="{StaticResource PageTitleStyle}" />
+            <Label Margin="0,8,0,18"
+                   Text="Interactive MAUI playground for memory leaks, performance profiling, and thread-safety warnings."
+                   Style="{StaticResource BodyStyle}" />
+
+            <Frame Style="{StaticResource SectionFrameStyle}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Global Tools" Style="{StaticResource PageTitleStyle}" FontSize="18" />
+                    <Label Text="Use these between scenarios to reset state, force GC, and create baselines."
+                           Style="{StaticResource BodyStyle}" />
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                        <Button Grid.Row="0" Grid.Column="0" Text="Force GC" Clicked="OnForceGc" Style="{StaticResource ActionButtonStyle}" />
+                        <Button Grid.Row="0" Grid.Column="1" Text="Snapshot" Clicked="OnSnapshot" Style="{StaticResource ActionButtonStyle}" />
+                        <Button Grid.Row="1" Grid.Column="0" Text="Reset" Clicked="OnReset" Style="{StaticResource ActionButtonStyle}" />
+                        <Button Grid.Row="1" Grid.Column="1" Text="Diagnostics Log" Clicked="OnDiagnostics" Style="{StaticResource ActionButtonStyle}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Style="{StaticResource SectionFrameStyle}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Scenarios" Style="{StaticResource PageTitleStyle}" FontSize="18" />
+                    <Button Text="S1 Clean Navigation" Clicked="OnScenario1" Style="{StaticResource ActionButtonStyle}" BackgroundColor="{StaticResource AccentGreen}" />
+                    <Button Text="S2 Static Event Leak" Clicked="OnScenario2" Style="{StaticResource ActionButtonStyle}" BackgroundColor="{StaticResource AccentRed}" />
+                    <Button Text="S3 Growing Leak" Clicked="OnScenario3" Style="{StaticResource ActionButtonStyle}" BackgroundColor="{StaticResource AccentOrange}" />
+                    <Button Text="S4 Performance Profiling" Clicked="OnScenario4" Style="{StaticResource ActionButtonStyle}" BackgroundColor="{StaticResource AccentBlue}" />
+                    <Button Text="S5 Thread Safety" Clicked="OnScenario5" Style="{StaticResource ActionButtonStyle}" BackgroundColor="{StaticResource AccentPurple}" />
+                    <Button Text="S6 Manual Snapshot Flow" Clicked="OnScenario6" Style="{StaticResource ActionButtonStyle}" BackgroundColor="{StaticResource AccentTeal}" />
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

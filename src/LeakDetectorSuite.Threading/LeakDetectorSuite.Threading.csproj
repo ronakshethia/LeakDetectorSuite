@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- ✅ FIXED -->
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Build -->
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <!-- NuGet -->
+  <PropertyGroup>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+    <PackageId>LeakDetectorSuite.Threading</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Ronak Shetiya</Authors>
+    <Company>Ronak Shetiya</Company>
+
+    <Title>.NET Thread Safety and UI Thread Guard Toolkit</Title>
+    <Description>
+      Runtime diagnostics toolkit for .NET and MAUI including memory leak detection,
+      performance monitoring, and thread safety analysis.
+    </Description>
+
+    <PackageTags>threading diagnostics dotnet maui thread-safety</PackageTags>
+
+    <RepositoryUrl>https://github.com/ronakshethia/LeakDetectorSuite</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <PackageProjectUrl>https://github.com/ronakshethia/LeakDetectorSuite</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md"
+          Pack="true"
+          PackagePath="\"
+          Condition="Exists('..\..\README.md')" />
+  </ItemGroup>
+
+</Project>

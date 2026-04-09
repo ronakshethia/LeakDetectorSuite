@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <LocalAndroidSdkDirectory>$([System.Environment]::GetFolderPath(System.Environment+SpecialFolder.LocalApplicationData))\Android\Sdk</LocalAndroidSdkDirectory>
+    <IncludeAndroidTarget Condition="'$(IncludeAndroidTarget)' == '' and Exists('$(LocalAndroidSdkDirectory)')">true</IncludeAndroidTarget>
+    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' and Exists('$(LocalAndroidSdkDirectory)')">$(LocalAndroidSdkDirectory)</AndroidSdkDirectory>
+  </PropertyGroup>
+</Project>

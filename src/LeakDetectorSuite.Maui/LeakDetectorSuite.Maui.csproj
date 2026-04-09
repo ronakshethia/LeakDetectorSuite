@@ -1,0 +1,96 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- ✅ FIX: Add Windows target -->
+    <TargetFrameworks>
+      net10.0-android;
+      net10.0-ios;
+      net10.0-maccatalyst;
+      net10.0-windows10.0.19041.0
+    </TargetFrameworks>
+
+    <OutputType>Library</OutputType>
+    <RootNamespace>LeakDetector.Maui</RootNamespace>
+
+    <!-- MAUI -->
+    <UseMaui>true</UseMaui>
+
+    <!-- Language -->
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Build -->
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <!-- ✅ Platform configs -->
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
+    <SupportedOSPlatformVersion>21.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-ios'">
+    <SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-maccatalyst'">
+    <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <!-- ✅ CRITICAL for Windows -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.19041.0'">
+    <UseWinUI>true</UseWinUI>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+  </PropertyGroup>
+
+  <!-- ✅ NuGet metadata -->
+  <PropertyGroup>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+    <PackageId>LeakDetectorSuite.Maui</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Ronak Shetiya</Authors>
+    <Company>Ronak Shetiya</Company>
+
+    <Title>MAUI Memory Leak Detector and Runtime Diagnostics</Title>
+    <Description>
+      Runtime diagnostics toolkit for .NET MAUI including memory leak detection,
+      performance monitoring, and threading diagnostics.
+    </Description>
+
+    <PackageTags>maui memory-leak diagnostics performance threading dotnet</PackageTags>
+
+    <RepositoryUrl>https://github.com/ronakshethia/LeakDetectorSuite</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <PackageProjectUrl>https://github.com/ronakshethia/LeakDetectorSuite</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <!-- README -->
+  <ItemGroup>
+    <None Include="..\..\README.md"
+          Pack="true"
+          PackagePath="\"
+          Condition="Exists('..\..\README.md')" />
+  </ItemGroup>
+
+  <!-- MAUI -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+  </ItemGroup>
+
+  <!-- Project refs -->
+  <ItemGroup>
+    <ProjectReference Include="..\LeakDetectorSuite.Memory\LeakDetectorSuite.Memory.csproj" />
+  </ItemGroup>
+
+</Project>

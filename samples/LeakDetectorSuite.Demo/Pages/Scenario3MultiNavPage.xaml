@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LeakDetector.Demo.Scenario3MultiNavPage"
+             Title="S3 Growing Leak">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="14">
+            <Label Text="Scenario 3: Growing Leak" Style="{StaticResource PageTitleStyle}" />
+            <Label x:Name="InstanceLabel" Text="Instance #0" TextColor="{StaticResource PrimaryTextColor}" FontSize="18" FontAttributes="Bold" />
+            <Label Text="Navigate here repeatedly. Each instance subscribes to a static event and never cleans up, so the count grows."
+                   Style="{StaticResource BodyStyle}" />
+            <Button Text="Go Back" Clicked="OnGoBack" Style="{StaticResource ActionButtonStyle}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,83 @@
+# .NET / MAUI .gitignore
+
+## Build outputs
+bin/
+obj/
+out/
+publish/
+
+## NuGet packages
+*.nupkg
+*.snupkg
+*.nuspec
+packages/
+.nuget/
+
+## User-specific files
+*.user
+*.suo
+*.userprefs
+*.userosscache
+*.sln.docstates
+.vs/
+
+## Visual Studio
+.vs/
+*.rsuser
+*.vsp
+*.vspbr
+*.vsd
+*.vss
+
+## JetBrains Rider
+.idea/
+*.sln.iml
+
+## OS-specific
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+Desktop.ini
+
+## Log files
+*.log
+crash*.txt
+
+## NuGet restore state
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Test Results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+## Android
+*.apk
+*.aab
+*.ap_
+*.dex
+google-services.json
+
+## iOS / macOS
+*.ipa
+*.xcarchive
+*.xcworkspace
+*.xcuserdata
+DerivedData/
+
+## Windows packaging
+*.msix
+*.appxupload
+*.appinstaller
+
+## Rider
+*.DotSettings.user
+
+## Environment secrets
+.env
+.env.local
+appsettings.Development.json

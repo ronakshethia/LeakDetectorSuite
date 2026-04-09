@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LeakDetector.Demo.Scenario4PerfPage"
+             Title="S4 Performance">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="14">
+            <Label Text="Scenario 4: Performance Profiling" Style="{StaticResource PageTitleStyle}" />
+            <Label x:Name="ThresholdLabel" Text="Threshold: 100 ms" TextColor="{StaticResource PrimaryTextColor}" FontSize="18" />
+            <Label Text="Run fast and slow operations and change the warning threshold to see how Perf.MeasureAsync logs." Style="{StaticResource BodyStyle}" />
+            <Button Text="Fast Operation" Clicked="OnFastOperation" Style="{StaticResource ActionButtonStyle}" />
+            <Button Text="Slow Operation" Clicked="OnSlowOperation" Style="{StaticResource ActionButtonStyle}" />
+            <Button Text="Set Threshold to 20 ms" Clicked="OnStrictThreshold" Style="{StaticResource ActionButtonStyle}" />
+            <Button Text="Run 50 ms Operation" Clicked="OnMediumOperation" Style="{StaticResource ActionButtonStyle}" />
+            <Button Text="Reset Threshold to 100 ms" Clicked="OnResetThreshold" Style="{StaticResource ActionButtonStyle}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

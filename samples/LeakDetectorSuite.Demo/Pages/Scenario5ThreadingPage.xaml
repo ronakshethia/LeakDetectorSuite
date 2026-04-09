@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LeakDetector.Demo.Scenario5ThreadingPage"
+             Title="S5 Thread Safety">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="14">
+            <Label Text="Scenario 5: Thread Safety" Style="{StaticResource PageTitleStyle}" />
+            <Label Text="Exercise EnsureMainThread and WarnIfBlockingCall to see good and bad threading behavior logged with file and line details."
+                   Style="{StaticResource BodyStyle}" />
+            <Button Text="Check Main Thread" Clicked="OnCheckMainThread" Style="{StaticResource ActionButtonStyle}" />
+            <Button Text="Call EnsureMainThread from Task.Run" Clicked="OnWrongThread" Style="{StaticResource ActionButtonStyle}" />
+            <Button Text="Simulate Blocking Call Warning" Clicked="OnBlockingCall" Style="{StaticResource ActionButtonStyle}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

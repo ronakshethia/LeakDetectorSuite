@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LeakDetector.Demo.Scenario1CleanNavPage"
+             Title="S1 Clean Navigation">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="14">
+            <Label Text="Scenario 1: Clean Navigation" Style="{StaticResource PageTitleStyle}" />
+            <Label Text="Subscribes to a static event and cleans up in OnDisappearing, proving the page can be collected."
+                   Style="{StaticResource BodyStyle}" />
+            <Button Text="Take Snapshot Here" Clicked="OnTakeSnapshot" Style="{StaticResource ActionButtonStyle}" />
+            <Button Text="Go Back (with cleanup)" Clicked="OnGoBack" Style="{StaticResource ActionButtonStyle}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,70 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Multi-target -->
+    <TargetFrameworks>
+      net10.0-android;
+      net10.0-ios;
+      net10.0-maccatalyst;
+      net10.0-windows10.0.19041.0
+    </TargetFrameworks>
+
+    <OutputType>Exe</OutputType>
+    <RootNamespace>LeakDetector.Demo</RootNamespace>
+
+    <!-- MAUI -->
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+
+    <!-- Language -->
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- App Info -->
+    <ApplicationTitle>LeakDetector Demo</ApplicationTitle>
+    <ApplicationId>com.leakdetector.demo</ApplicationId>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+  </PropertyGroup>
+
+  <!-- ✅ Platform-specific configs -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.19041.0'">
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+
+    <!-- REQUIRED for WinUI -->
+    <UseWinUI>true</UseWinUI>
+
+    <!-- Optional but recommended -->
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
+    <SupportedOSPlatformVersion>21.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-ios'">
+    <SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-maccatalyst'">
+    <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <!-- Packages -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+  </ItemGroup>
+
+  <!-- Project refs -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\LeakDetectorSuite.Maui\LeakDetectorSuite.Maui.csproj" />
+    <ProjectReference Include="..\..\src\LeakDetectorSuite.Memory\LeakDetectorSuite.Memory.csproj" />
+    <ProjectReference Include="..\..\src\LeakDetectorSuite.Performance\LeakDetectorSuite.Performance.csproj" />
+    <ProjectReference Include="..\..\src\LeakDetectorSuite.Threading\LeakDetectorSuite.Threading.csproj" />
+  </ItemGroup>
+
+<PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.19041.0'">
+  <WindowsPackageType>None</WindowsPackageType>
+</PropertyGroup>
+</Project>

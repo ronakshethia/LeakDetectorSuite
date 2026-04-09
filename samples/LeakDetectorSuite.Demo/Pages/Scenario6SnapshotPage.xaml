@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LeakDetector.Demo.Scenario6SnapshotPage"
+             Title="S6 Snapshot Flow">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="14">
+            <Label Text="Scenario 6: Manual Snapshot Comparison" Style="{StaticResource PageTitleStyle}" />
+            <Label Text="Walk through a before snapshot, tracked object creation, reference release, and after snapshot comparison."
+                   Style="{StaticResource BodyStyle}" />
+            <Button x:Name="BeforeButton" Text="1. Take Before Snapshot" Clicked="OnTakeBefore" Style="{StaticResource ActionButtonStyle}" />
+            <Button x:Name="CreateButton" Text="2. Create 3 Tracked Objects" Clicked="OnCreateObjects" Style="{StaticResource ActionButtonStyle}" IsEnabled="False" />
+            <Button x:Name="ReleaseButton" Text="3. Release + Force GC" Clicked="OnReleaseObjects" Style="{StaticResource ActionButtonStyle}" IsEnabled="False" />
+            <Button x:Name="CompareButton" Text="4. Take After + Compare" Clicked="OnCompare" Style="{StaticResource ActionButtonStyle}" IsEnabled="False" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
